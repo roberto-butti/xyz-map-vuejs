@@ -35,7 +35,7 @@ export default {
     console.log(this.$refs)
 	// setup the Map Display
     this.map = new  here.xyz.maps.Map( this.$refs.myMap, {
-        zoomLevel : 17,
+        zoomLevel : 4,
         center: {
             longitude: -122.46852, latitude: 37.77956
         },
