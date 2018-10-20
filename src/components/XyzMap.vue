@@ -49,14 +49,55 @@ export default {
     console.log('map created')
 
     //ADDING SPACES
+    var myStyle = {
+    	styleGroups: {
+    		noneStyle: [
+	    		{zIndex:0, type:"Circle", radius:3, fill:"#00FF00"},
+	    		{zIndex:3, type:"Text", textRef:"properties.cou", fill:"#3D272B"}
+            ],
+            lightStyle: [
+	    		{zIndex:0, type:"Circle", radius:3, fill:"#FFFF00"},
+	    		{zIndex:3, type:"Text", textRef:"properties.cou", fill:"#3D272B"}
+            ],
+            mediumStyle: [
+	    		{zIndex:0, type:"Circle", radius:5, fill:"#0000FF"},
+	    		{zIndex:3, type:"Text", textRef:"properties.cou", fill:"#3D272B"}
+            ],
+            heavyStyle: [
+	    		{zIndex:0, type:"Circle", radius:8, fill:"#FF0000"},
+	    		{zIndex:3, type:"Text", textRef:"properties.cou", fill:"#3D272B"}
+            ],
 
+            
+    	},
+
+		assign: function(feature, zoomlevel){
+            var prop = feature.properties;
+            console.log(prop)
+            if (prop.WTC == 1) {
+                return "lightStyle";
+            }
+            if (prop.WTC == 2) {
+                return "mediumStyle";
+            }
+            if (prop.WTC == 3) {
+                return "heavyStyle";
+            }
+
+            return "noneStyle";
+
+
+         	
+		}
+    }
     var mySpaceProvider = new here.xyz.maps.providers.SpaceProvider ({
         name:  process.env.VUE_APP_SPACE,
         level: 2,
         space: process.env.VUE_APP_SPACE,
         credentials: {
                 access_token: YOUR_ACCESS_TOKEN
-        }
+        },
+        
     });
     console.log('space provider', mySpaceProvider)
     // Create data layer with Space provider
@@ -64,7 +105,8 @@ export default {
     name: 'mySpaceLayer',
     min: 2,
     max: 20,
-    provider: mySpaceProvider
+    provider: mySpaceProvider,
+    style: myStyle
     })
     console.log("spacelayer", mySpaceLayer)
     this.map.addLayer( mySpaceLayer )
