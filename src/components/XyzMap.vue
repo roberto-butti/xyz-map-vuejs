@@ -27,7 +27,8 @@ export default {
             provider: new here.xyz.maps.providers.ImageProvider({
                 name: 'Live Map',
                 //url : 'https://{SUBDOMAIN_INT_1_4}.mapcreator.tilehub.api.here.com/tilehub/wv_livemap_bc/png/sat/256/{QUADKEY}?access_token='+YOUR_ACCESS_TOKEN
-                url: 'http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg'
+                //url: 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg'
+                url: '//stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg'
             })
         })
     ]
@@ -35,7 +36,7 @@ export default {
     console.log(this.$refs)
 	// setup the Map Display
     this.map = new  here.xyz.maps.Map( this.$refs.myMap, {
-        zoomLevel : 4,
+        zoomLevel : 10,
         center: {
             longitude: -122.46852, latitude: 37.77956
         },
