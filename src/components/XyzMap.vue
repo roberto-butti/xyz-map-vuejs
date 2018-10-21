@@ -1,6 +1,7 @@
 <template>
     <div class="map-container">
         <div class="input-map" ref="myInputMap">
+            <input type="search" ref="city" class="form-control" placeholder="In which city do you live?" />
 
             <input v-model="zoom" placeholder="zoom level">
             <input v-model="lat" placeholder="latitude">
@@ -27,7 +28,31 @@ export default {
     msg: String
   },
   computed: {},
+  methods: {
+    handleOnChange: function (e) {
+      console.log("SELECTED",e);
+      this.map.setCenter(e.suggestion.latlng.lng, e.suggestion.latlng.lat);
+      this.map.setZoomlevel(10);
+      console.log(e.suggestion.latlng);
+
+    },
+    loadSearchPlaces: function () {
+      var placesAutocomplete = places({
+        container: this.$refs.city,
+        type: 'city',
+        aroundLatLngViaIP: false,
+        templates: {
+          value: function(suggestion) {
+            console.log(suggestion);
+            return suggestion.name;
+          }
+        }
+      });
+      placesAutocomplete.on('change', this.handleOnChange);
+    }
+  },
   mounted: function() {
+    this.loadSearchPlaces();
     this.zoom = 4;
     console.log("a is: " + this.msg);
     var YOUR_ACCESS_TOKEN = process.env.VUE_APP_SPACE_TOKEN; //readonly token
