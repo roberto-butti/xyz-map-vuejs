@@ -129,20 +129,18 @@ export default {
     console.log("spacelayer", mySpaceLayer);
     this.map.addLayer(mySpaceLayer);
     console.log("spacelayer added", this.map);
-    this.map.addObserver('zoomlevel', function (name, newValue, oldValue){
+    this.map.addObserver('zoomlevel',(name, newValue, oldValue) => {
       console.log(name + " new: "+ newValue + " old:" + oldValue);
-      console.log(window.app.__vue__.$children[0].$children[0]);
-      window.app.__vue__.$children[0].$children[0].$data.zoom = newValue;
+      this.zoom = newValue
 
     });
-    // Add observer to center
-    this.map.addObserver('center', function (name, newValue, oldValue){
-      window.app.__vue__.$children[0].$children[0].$data.lat = newValue.latitude
-      window.app.__vue__.$children[0].$children[0].$data.lng = newValue.longitude
-
-      console.log(newValue);
-      //console.log( name + " new: "+ JSON.stringify(newValue, null, 4) + " old:" + JSON.stringify(oldValue, null, 4));
+    this.map.addObserver('center',(name, newValue, oldValue) => {
+      console.log(name + " new: "+ newValue + " old:" + oldValue);
+      this.lat = newValue.latitude
+      this.lng = newValue.longitude
     });
+
+
   }
 };
 </script>
