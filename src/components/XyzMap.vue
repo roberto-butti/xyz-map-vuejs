@@ -2,10 +2,7 @@
     <div class="map-container">
         <div class="input-map" ref="myInputMap">
             <input type="search" ref="city" class="form-control" placeholder="In which city do you live?" />
-
-            <input v-model="zoom" placeholder="zoom level">
-            <input v-model="lat" placeholder="latitude">
-            <input v-model="lng" placeholder="longitude">
+            {{ lat}},{{lng}}/{{zoom}}
 
         </div>
         <div class="map" ref="myMap">
@@ -65,6 +62,7 @@ export default {
         provider: new here.xyz.maps.providers.ImageProvider({
           name: "Live Map",
           //url : 'https://{SUBDOMAIN_INT_1_4}.mapcreator.tilehub.api.here.com/tilehub/wv_livemap_bc/png/sat/256/{QUADKEY}?access_token='+YOUR_ACCESS_TOKEN
+          //url: 'https://{SUBDOMAIN_INT_1_4}.base.maps.api.here.com/maptile/2.1/basetile/newest/reduced.night/{LEVEL}/{COL}/{ROW}/256/png8?access_token='+YOUR_ACCESS_TOKEN
           //url: 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg'
           url: "//stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg"
         })
