@@ -6,25 +6,14 @@
 
       app
     >
-    <SearchPlaces msg=this.appname />
-      <v-list dense>
-        <v-list-tile @click="">
-          <v-list-tile-action>
-            <v-icon>home</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Home</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile @click="">
-          <v-list-tile-action>
-            <v-icon>contact_mail</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Contact</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
+      <v-card>
+        <v-card-title primary-title>
+          <h2>Search your place</h2>
+          <SearchPlaces msg=this.appname />
+        </v-card-title>
+
+
+      </v-card>
     </v-navigation-drawer>
 
     <v-toolbar  dense  color="indigo" dark fixed app>
@@ -34,8 +23,8 @@
     </v-toolbar>
 
     <v-content>
-      <v-container fluid fill-height>
-        <v-layout justify-center align-center>
+      <v-container fluid fill-height pa-0>
+        <v-layout justify-center align-center >
           <v-flex text-xs-center>
             <div id="app">
               <XyzMap msg=this.appname />
@@ -45,7 +34,7 @@
         </v-layout>
       </v-container>
     </v-content>
-    <v-footer color="cyan" app>
+    <v-footer color="indigo" app>
       <v-spacer></v-spacer>
       <span class="white--text">&copy; 2018</span>
     </v-footer>

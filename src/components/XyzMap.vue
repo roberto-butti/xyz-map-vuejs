@@ -1,5 +1,5 @@
 <template>
-    <div class="map-container">
+    <div v-resize="onResize" class="map-container">
         <div class="map" ref="myMap">
         </div>
   </div>
@@ -41,13 +41,22 @@ export default {
           ||
           this.mapCurrentLng != this.lng
         ) {
-          console.log("CHANGED MONITOR",this.lat,this.lng);
+          console.log("CHANGED MONITOR X Y",this.lat,this.lng);
           this.setLatLngAction({ lat: this.mapCurrentLat, lng: this.mapCurrentLng})
         }
+        if (this.mapCurrentZoom != this.zoom ) {
+          console.log("CHANGED MONITOR Z",this.zoom);
+          this.setZoomAction(this.mapCurrentZoom)
+        }
+
+
         //console.log("MONITOR",this.lat,this.lng);
       }, 1*1000);
 
       //console.log(this.lng);
+    },
+    onResize: function () {
+      this.map.resize();
     }
   },
   mounted: function() {
@@ -159,11 +168,13 @@ export default {
     maplocal.addLayer(mySpaceLayer);
     console.log("spacelayer added", maplocal);
     maplocal.addObserver('zoomlevel',(name, newValue, oldValue) => {
-      console.log(name + " new: "+ newValue + " old:" + oldValue);
-
+      //console.log(name + " new: "+ newValue + " old:" + oldValue);
+      this.mapCurrentZoom =  newValue;
+      /*
       if (Math.abs(this.zoom - newValue) >= 1) {
         this.setZoomAction(newValue)
       }
+      */
 
 
     });
@@ -177,6 +188,12 @@ export default {
     //setTimeout(this.monitorChanges(), (1 * 1000));
     this.monitorChanges();
     this.setMapAction(maplocal);
+    this.$nextTick(function () {
+      this.onResize();
+    })
+
+
+    //maplocal.getViewPort().resize()
 
 
   }
@@ -188,18 +205,13 @@ export default {
 .map {
   top: 0;
   left: 0;
-  width: 100%;
-  height: 90vh;
-}
-.input-map {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 10vh;
+  /*width: 100%;*/
+  height: 88vh;
 }
 .map-container {
   top: 0;
   left: 0;
+  padding: 0px;
   width: 100%;
   /*height: 400px;*/
 }

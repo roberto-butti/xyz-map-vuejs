@@ -34,12 +34,11 @@ export default {
     handleOnChange: function (e) {
       this.setLatLngAction({
         lng: e.suggestion.latlng.lng,
-        lat: e.suggestion.latlng.lat,
-        map: this.map
+        lat: e.suggestion.latlng.lat
       })
       this.setZoomAction(10);
 
-      console.log(e.suggestion.latlng);
+      //console.log(e.suggestion.latlng);
 
     },
     loadSearchPlaces: function () {

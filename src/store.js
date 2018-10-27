@@ -40,12 +40,13 @@ export default new Vuex.Store({
 
       state.map.setCenter(lng, lat);
     },
-    setZoomAction({ commit },  zoom ){
+    setZoomAction({ commit, state },  zoom ){
       console.log("setZoomAction",zoom);
       commit({
         type: 'setZoom',
         zoom,
       })
+      state.map.setZoomlevel(zoom);
     },
     setMapAction({ commit }, map ){
       commit({
