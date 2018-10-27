@@ -1,56 +1,61 @@
 <template>
     <div class="map-container">
-        <div class="input-map" ref="myInputMap">
-            <input type="search" ref="city" class="form-control" placeholder="In which city do you live?" />
-            {{ lat}},{{lng}}/{{zoom}}
-
-        </div>
         <div class="map" ref="myMap">
         </div>
   </div>
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
 export default {
   name: "XyzMap",
   data: function() {
     return {
-      map: null,
-      zoom: 4,
-      lat: 37.77956,
-      lng: -122.46852
+      mapCurrentLat: null,
+      mapCurrentLng: null,
+      mapCurrentZoom: null
+
     };
   },
   props: {
     msg: String
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      lat: state => state.lat,
+      lng: state => state.lng,
+      zoom: state => state.zoom,
+      map: state => state.map,
+    })
+  },
   methods: {
-    handleOnChange: function (e) {
-      console.log("SELECTED",e);
-      this.map.setCenter(e.suggestion.latlng.lng, e.suggestion.latlng.lat);
-      this.map.setZoomlevel(10);
-      console.log(e.suggestion.latlng);
-
-    },
-    loadSearchPlaces: function () {
-      var placesAutocomplete = places({
-        container: this.$refs.city,
-        type: 'city',
-        aroundLatLngViaIP: false,
-        templates: {
-          value: function(suggestion) {
-            console.log(suggestion);
-            return suggestion.name;
-          }
+    ...mapActions({
+      setLatLngAction: 'setLatLngAction',
+      setZoomAction: 'setZoomAction',
+      setMapAction: 'setMapAction'
+    }),
+    monitorChanges: function () {
+      this.intervalmonitor = setInterval( () => {
+        if (
+          this.mapCurrentLat != this.lat
+          ||
+          this.mapCurrentLng != this.lng
+        ) {
+          console.log("CHANGED MONITOR",this.lat,this.lng);
+          this.setLatLngAction({ lat: this.mapCurrentLat, lng: this.mapCurrentLng})
         }
-      });
-      placesAutocomplete.on('change', this.handleOnChange);
+        //console.log("MONITOR",this.lat,this.lng);
+      }, 1*1000);
+
+      //console.log(this.lng);
     }
   },
   mounted: function() {
-    this.loadSearchPlaces();
-    this.zoom = 4;
+    this.mapCurrentLat = this.lat;
+    this.mapCurrentLng = this.lng;
+    this.mapCurrentZoom = this.zoom;
+
+    //this.setZoomAction(4);
     console.log("a is: " + this.msg);
     var YOUR_ACCESS_TOKEN = process.env.VUE_APP_SPACE_TOKEN; //readonly token
     console.log("access: " + YOUR_ACCESS_TOKEN);
@@ -70,7 +75,8 @@ export default {
     ];
     console.log("layers created");
     console.log(this.$refs);
-    this.map = new here.xyz.maps.Map(this.$refs.myMap, {
+    console.log(this.zoom, this.lat, this.lng)
+    var maplocal = new here.xyz.maps.Map(this.$refs.myMap, {
       zoomLevel: this.zoom,
       center: {
         longitude: this.lng,
@@ -78,7 +84,7 @@ export default {
       },
       layers: layers
     });
-    console.log("map created");
+    console.log("map created",maplocal);
     var myStyle = {
       styleGroups: {
         noneStyle: [
@@ -150,18 +156,27 @@ export default {
       style: myStyle
     });
     console.log("spacelayer", mySpaceLayer);
-    this.map.addLayer(mySpaceLayer);
-    console.log("spacelayer added", this.map);
-    this.map.addObserver('zoomlevel',(name, newValue, oldValue) => {
+    maplocal.addLayer(mySpaceLayer);
+    console.log("spacelayer added", maplocal);
+    maplocal.addObserver('zoomlevel',(name, newValue, oldValue) => {
       console.log(name + " new: "+ newValue + " old:" + oldValue);
-      this.zoom = newValue
+
+      if (Math.abs(this.zoom - newValue) >= 1) {
+        this.setZoomAction(newValue)
+      }
+
 
     });
-    this.map.addObserver('center',(name, newValue, oldValue) => {
-      console.log(name + " new: "+ newValue + " old:" + oldValue);
-      this.lat = newValue.latitude
-      this.lng = newValue.longitude
+    maplocal.addObserver('center',(name, newValue, oldValue) => {
+      //console.log(name + " new: "+ newValue + " old:" + oldValue);
+      this.mapCurrentLat =  newValue.latitude;
+      this.mapCurrentLng =  newValue.longitude;
+      //this.setLatLngAction({ lat: newValue.latitude, lng: newValue.longitude})
     });
+
+    //setTimeout(this.monitorChanges(), (1 * 1000));
+    this.monitorChanges();
+    this.setMapAction(maplocal);
 
 
   }
