@@ -34,10 +34,10 @@
         </v-layout>
       </v-container>
     </v-content>
-    <v-footer color="indigo" app>
+    <!--v-footer color="indigo" app>
       <v-spacer></v-spacer>
       <span class="white--text">&copy; 2018</span>
-    </v-footer>
+    </v-footer-->
   </v-app>
 
 </template>
