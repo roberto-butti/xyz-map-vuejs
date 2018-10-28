@@ -7,14 +7,16 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+const axios = require('axios');
 export default {
   name: "XyzMap",
   data: function() {
     return {
       mapCurrentLat: null,
       mapCurrentLng: null,
-      mapCurrentZoom: null
-
+      mapCurrentZoom: null,
+      pointLayer: null,
+      addedPoints: []
     };
   },
   props: {
@@ -57,6 +59,45 @@ export default {
     },
     onResize: function () {
       this.map.resize();
+    },
+    addFeatures: function (list) {
+      console.log(list.srcFeed)
+      var fc = {
+        type: "FeatureCollection",
+        features: []
+      }
+      list.acList.forEach(element => {
+        var f = {
+          type: "Feature",
+          geometry: {
+			      coordinates: [element.Long, element.Lat, element.AltT],
+			      type: "Point"
+          },
+          properties: element
+        }
+        fc.features.push(f)
+        console.log(element)
+
+      });
+      if (this.addedPoints) {
+
+        this.addedPoints.forEach( (point) => {
+			    this.pointLayer.removeFeature(point);
+		    })
+		    this.addedPoints = [];
+      }
+      this.addedPoints = this.pointLayer.addFeature(fc)
+    },
+    createMarkers: function () {
+      console.log("createMarkers");
+      var kms = "30"
+      var urlAdsb = "https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json?lat="+this.lat+"&lng="+this.lng+"&fDstL=0&fDstU="+kms;
+
+      console.log(urlAdsb);
+      var urlProxy = "https://cors-anywhere.herokuapp.com/";
+      axios
+        .get(urlProxy+""+urlAdsb)
+        .then(response => ( this.addFeatures(response.data)))
     }
   },
   mounted: function() {
@@ -84,109 +125,89 @@ export default {
     ];
 
     var layers2 = [
-
-            new here.xyz.maps.layers.MVTLayer({
-                name   : 'mvt-world-layer',
-                remote : {
-                    url : 'https://xyz.api.here.com/tiles/osmbase/256/all/{z}/{x}/{y}.mvt'
-                    // optional settings:
-                    // max  : 16,     // max level for loading data
-                    // min  : 1       // min level for loading data
-                    // tileSize : 512 // 512|256 defines mvt tilesize in case it can't be automatically detected in url..
-                },
-                min : 1,
-                max : 20,
-                /*
-                How to Style
-                https://xyz.api.here.com/maps/latest/documentation/here.xyz.maps.layers.TileLayer.Style.html
-                */
-                style : {
-
-                    backgroundColor: '#555555',
-
-                    strokeWidthZoomScale: function (level) {
-                        return level > 17 ? 1 : level > 14 ? .5 : .25
-                    },
-
-                    styleGroups: {
-                      'earth'        : [{ zIndex: 1, type: 'Polygon', fill: '#DEDEDE' }],
-                      'water'        : [{ zIndex: 2, type: 'Polygon', fill: '#79CFEE' }],
-                      'landuse'      : [{ zIndex: 3, type: 'Polygon', fill: '#B7E4A1' }],
-                      'road_transport'        : [
-
-                        {zIndex:4, type:"Line", stroke:"#B6B8C3", "strokeWidth":4, "strokeLinecap": "butt"},
-                        {zIndex:5, type:"Line", stroke:"#C8C9CE", "strokeWidth":4, "strokeLinecap": "butt", 'strokeDasharray': [12,10]},
-
-                      ],
-                      'roads' : [
-                        {zIndex:5, type:"Line", stroke:"#D6D9E6", "strokeWidth":14},
-                        {zIndex:6, type:"Line", stroke:"#FFFFFF", "strokeWidth":10},
-                        {zIndex:100, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal  12px Verdana"}
-                      ],
-                      'roadshighway' : [
-                        {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
-                        {zIndex:9, type:"Line", stroke:"#FDA363", "strokeWidth":10},
-                        {zIndex:101, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal 12px Verdana"}
-                      ],
-                      'roadsmajor_road' : [
-                        {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
-                        {zIndex:9, type:"Line", stroke:"#F1D06B", "strokeWidth":10},
-                        {zIndex:102, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal 12px Verdana"}
-                      ],
-
-                      'buildings'    : [
-                        { zIndex: 11, type: 'Polygon', stroke: "#BDBBB7","strokeWidth":1, fill: '#D6D6D6' },
-                        /* { zIndex:12, type:"Text", 'textRef':"properties.kind_detail", fill:"#252525"} */
-                      ]
-                    },
-
-                    assign: function (feature, level)
-                    {
-                        var props = feature.properties;
-                        var kind  = props.kind;
-                        var layer = props.layer; // the data layer of the feature
-                        var geom  = feature.geometry.type;
-
-                        //console.log(layer+ "-"+kind+"-"+geom);
-                        //console.log(props);
-
-                        if (layer == 'water') {
-                            if (geom == 'LineString' ) {
-                                return ;
-                            }
-                            if (geom == 'MultiLineString') {
-                              return ;
-                            }
-
-                        }
-
-                        if (layer== 'buildings') {
-
-                        }
-                        if (layer == 'roads') {
-                            //console.log(kind);
-                            if (kind == 'rail' || kind == 'ferry') {
-                                return 'road_transport';
-                            }
-                            if (kind == 'highway') {
-                                return layer + kind;
-                            }
-                            if (kind == 'major_road') {
-                                return layer + kind;
-                            }
-
-                        }
-                        return layer;
-                    }
-                }
-            })
-
+      new here.xyz.maps.layers.MVTLayer({
+        name   : 'mvt-world-layer',
+        remote : {
+          url : 'https://xyz.api.here.com/tiles/osmbase/256/all/{z}/{x}/{y}.mvt'
+          // optional settings:
+          // max  : 16,     // max level for loading data
+          // min  : 1       // min level for loading data
+          // tileSize : 512 // 512|256 defines mvt tilesize in case it can't be automatically detected in url..
+        },
+        min : 1,
+        max : 20,
+        /*
+        How to Style
+        https://xyz.api.here.com/maps/latest/documentation/here.xyz.maps.layers.TileLayer.Style.html
+        */
+        style : {
+          backgroundColor: '#555555',
+          strokeWidthZoomScale: function (level) {
+            return level > 17 ? 1 : level > 14 ? .5 : .25
+          },
+          styleGroups: {
+            'earth'        : [{ zIndex: 1, type: 'Polygon', fill: '#DEDEDE' }],
+            'water'        : [{ zIndex: 2, type: 'Polygon', fill: '#79CFEE' }],
+            'landuse'      : [{ zIndex: 3, type: 'Polygon', fill: '#B7E4A1' }],
+            'road_transport'        : [
+              {zIndex:4, type:"Line", stroke:"#B6B8C3", "strokeWidth":4, "strokeLinecap": "butt"},
+              {zIndex:5, type:"Line", stroke:"#C8C9CE", "strokeWidth":4, "strokeLinecap": "butt", 'strokeDasharray': [12,10]},
+            ],
+            'roads' : [
+              {zIndex:5, type:"Line", stroke:"#D6D9E6", "strokeWidth":14},
+              {zIndex:6, type:"Line", stroke:"#FFFFFF", "strokeWidth":10},
+              {zIndex:100, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal  12px Verdana"}
+            ],
+            'roadshighway' : [
+              {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
+              {zIndex:9, type:"Line", stroke:"#FDA363", "strokeWidth":10},
+              {zIndex:101, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal 12px Verdana"}
+            ],
+            'roadsmajor_road' : [
+              {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
+              {zIndex:9, type:"Line", stroke:"#F1D06B", "strokeWidth":10},
+              {zIndex:102, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal 12px Verdana"}
+            ],
+            'buildings'    : [
+              { zIndex: 11, type: 'Polygon', stroke: "#BDBBB7","strokeWidth":1, fill: '#D6D6D6' },
+              /* { zIndex:12, type:"Text", 'textRef':"properties.kind_detail", fill:"#252525"} */
+            ]
+          },
+          assign: function (feature, level)
+          {
+            var props = feature.properties;
+            var kind  = props.kind;
+            var layer = props.layer; // the data layer of the feature
+            var geom  = feature.geometry.type;
+            //console.log(layer+ "-"+kind+"-"+geom);
+            //console.log(props);
+            if (layer == 'water') {
+              if (geom == 'LineString' ) {
+                return ;
+              }
+              if (geom == 'MultiLineString') {
+                return ;
+              }
+            }
+            if (layer== 'buildings') {
+            }
+            if (layer == 'roads') {
+              //console.log(kind);
+              if (kind == 'rail' || kind == 'ferry') {
+                  return 'road_transport';
+              }
+              if (kind == 'highway') {
+                  return layer + kind;
+              }
+              if (kind == 'major_road') {
+                  return layer + kind;
+              }
+            }
+            return layer;
+          }
+        }
+      })
     ];
-
-
-
-
-
     console.log("layers created");
     console.log(this.$refs);
     console.log(this.zoom, this.lat, this.lng)
@@ -202,7 +223,12 @@ export default {
     var myStyle = {
       styleGroups: {
         noneStyle: [
-          { zIndex: 0, type: "Circle", radius: 3, fill: "#00FF00" },
+          {
+            zIndex: 0,
+            type: "Circle",
+            radius: 3,
+            fill: "#00FF00"
+          },
           {
             zIndex: 3,
             type: "Text",
@@ -211,7 +237,12 @@ export default {
           }
         ],
         lightStyle: [
-          { zIndex: 0, type: "Circle", radius: 3, fill: "#FFFF00" },
+          {
+            zIndex: 0,
+            type: "Circle",
+            radius: 3,
+            fill: "#FFFF00"
+          },
           {
             zIndex: 3,
             type: "Text",
@@ -220,7 +251,12 @@ export default {
           }
         ],
         mediumStyle: [
-          { zIndex: 0, type: "Circle", radius: 5, fill: "#0000FF" },
+          {
+            zIndex: 0,
+            type: "Circle",
+            radius: 5,
+            fill: "#0000FF"
+          },
           {
             zIndex: 3,
             type: "Text",
@@ -229,7 +265,12 @@ export default {
           }
         ],
         heavyStyle: [
-          { zIndex: 0, type: "Circle", radius: 8, fill: "#FF0000" },
+          {
+            zIndex: 0,
+            type: "Circle",
+            radius: 8,
+            fill: "#FF0000"
+          },
           {
             zIndex: 3,
             type: "Text",
@@ -272,43 +313,31 @@ export default {
     console.log("spacelayer", mySpaceLayer);
     //maplocal.addLayer(mySpaceLayer);
 
-    var pointLayer = new here.xyz.maps.layers.TileLayer({
-        			name: 'my Point Layer',
-                    min: 4,
-                    max: 15,
-                    provider: new here.xyz.maps.providers.LocalProvider ({
-					    name:  'my Point Provider'
-					}),
-				    style:{
-					    styleGroups: {
-					    	style: [
-						    	{zIndex:0, type:"Circle", "stroke": "#FFFFFF", "fill": "#6B6B6B", radius: 3},
-						    	{zIndex:1, type:"Text", textRef:"properties.name", fill:"#111", offsetY: 12, font: "bold 13px ariel"}
-						    ]
-					    },
-					    assign: function(feature){
-					    	return "style";
-					    }
-				    }
-        });
-        maplocal.addLayer(pointLayer);
-
-
-
-
-
+    this.pointLayer = new here.xyz.maps.layers.TileLayer({
+      name: 'my Point Layer',
+        min: 4,
+        max: 15,
+        provider: new here.xyz.maps.providers.LocalProvider ({
+      name:  'my Point Provider'
+      }),
+      style:{
+        styleGroups: {
+          style: [
+            {zIndex:0, type:"Circle", "stroke": "#FFFFFF", "fill": "#6B6B6B", radius: 10},
+            {zIndex:1, type:"Text", textRef:"properties.Icao", fill:"#111", font: "normal 13px ariel"}
+          ]
+        },
+        assign: function(feature){
+          return "style";
+        }
+      }
+    });
+    maplocal.addLayer(this.pointLayer);
 
     console.log("spacelayer added", maplocal);
     maplocal.addObserver('zoomlevel',(name, newValue, oldValue) => {
       //console.log(name + " new: "+ newValue + " old:" + oldValue);
       this.mapCurrentZoom =  newValue;
-      /*
-      if (Math.abs(this.zoom - newValue) >= 1) {
-        this.setZoomAction(newValue)
-      }
-      */
-
-
     });
     maplocal.addObserver('center',(name, newValue, oldValue) => {
       //console.log(name + " new: "+ newValue + " old:" + oldValue);
@@ -316,18 +345,18 @@ export default {
       this.mapCurrentLng =  newValue.longitude;
       //this.setLatLngAction({ lat: newValue.latitude, lng: newValue.longitude})
     });
-
     //setTimeout(this.monitorChanges(), (1 * 1000));
     this.monitorChanges();
     this.setMapAction(maplocal);
+    this.createMarkers()
+    setInterval( () => {
+      this.createMarkers()
+    }, 10000 );
     this.$nextTick(function () {
       this.onResize();
+
     })
-
-
     //maplocal.getViewPort().resize()
-
-
   }
 };
 </script>
