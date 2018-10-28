@@ -96,7 +96,10 @@ export default {
                 },
                 min : 1,
                 max : 20,
-
+                /*
+                How to Style
+                https://xyz.api.here.com/maps/latest/documentation/here.xyz.maps.layers.TileLayer.Style.html
+                */
                 style : {
 
                     backgroundColor: '#555555',
@@ -118,17 +121,17 @@ export default {
                       'roads' : [
                         {zIndex:5, type:"Line", stroke:"#D6D9E6", "strokeWidth":14},
                         {zIndex:6, type:"Line", stroke:"#FFFFFF", "strokeWidth":10},
-                        {zIndex:7, type:"Text", 'textRef':"properties.name", fill:"#252525"}
+                        {zIndex:100, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal  12px Verdana"}
                       ],
                       'roadshighway' : [
                         {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
                         {zIndex:9, type:"Line", stroke:"#FDA363", "strokeWidth":10},
-                        {zIndex:100, type:"Text", 'textRef':"properties.name", fill:"#252525"}
+                        {zIndex:101, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal 12px Verdana"}
                       ],
                       'roadsmajor_road' : [
                         {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
                         {zIndex:9, type:"Line", stroke:"#F1D06B", "strokeWidth":10},
-                        {zIndex:10, type:"Text", 'textRef':"properties.name", fill:"#252525"}
+                        {zIndex:102, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal 12px Verdana"}
                       ],
 
                       'buildings'    : [
