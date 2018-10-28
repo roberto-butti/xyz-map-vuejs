@@ -68,7 +68,7 @@ export default {
     console.log("a is: " + this.msg);
     var YOUR_ACCESS_TOKEN = process.env.VUE_APP_SPACE_TOKEN; //readonly token
     console.log("access: " + YOUR_ACCESS_TOKEN);
-    var layers = [
+    var layers1 = [
       new here.xyz.maps.layers.TileLayer({
         name: "Image Layer",
         min: 1,
@@ -82,6 +82,108 @@ export default {
         })
       })
     ];
+
+    var layers2 = [
+
+            new here.xyz.maps.layers.MVTLayer({
+                name   : 'mvt-world-layer',
+                remote : {
+                    url : 'https://xyz.api.here.com/tiles/osmbase/256/all/{z}/{x}/{y}.mvt'
+                    // optional settings:
+                    // max  : 16,     // max level for loading data
+                    // min  : 1       // min level for loading data
+                    // tileSize : 512 // 512|256 defines mvt tilesize in case it can't be automatically detected in url..
+                },
+                min : 1,
+                max : 20,
+
+                style : {
+
+                    backgroundColor: '#555555',
+
+                    strokeWidthZoomScale: function (level) {
+                        return level > 17 ? 1 : level > 14 ? .5 : .25
+                    },
+
+                    styleGroups: {
+                      'earth'        : [{ zIndex: 1, type: 'Polygon', fill: '#DEDEDE' }],
+                      'water'        : [{ zIndex: 2, type: 'Polygon', fill: '#79CFEE' }],
+                      'landuse'      : [{ zIndex: 3, type: 'Polygon', fill: '#B7E4A1' }],
+                      'road_transport'        : [
+
+                        {zIndex:4, type:"Line", stroke:"#B6B8C3", "strokeWidth":4, "strokeLinecap": "butt"},
+                        {zIndex:5, type:"Line", stroke:"#C8C9CE", "strokeWidth":4, "strokeLinecap": "butt", 'strokeDasharray': [12,10]},
+
+                      ],
+                      'roads' : [
+                        {zIndex:5, type:"Line", stroke:"#D6D9E6", "strokeWidth":14},
+                        {zIndex:6, type:"Line", stroke:"#FFFFFF", "strokeWidth":10},
+                        {zIndex:7, type:"Text", 'textRef':"properties.name", fill:"#252525"}
+                      ],
+                      'roadshighway' : [
+                        {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
+                        {zIndex:9, type:"Line", stroke:"#FDA363", "strokeWidth":10},
+                        {zIndex:100, type:"Text", 'textRef':"properties.name", fill:"#252525"}
+                      ],
+                      'roadsmajor_road' : [
+                        {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
+                        {zIndex:9, type:"Line", stroke:"#F1D06B", "strokeWidth":10},
+                        {zIndex:10, type:"Text", 'textRef':"properties.name", fill:"#252525"}
+                      ],
+
+                      'buildings'    : [
+                        { zIndex: 11, type: 'Polygon', stroke: "#BDBBB7","strokeWidth":1, fill: '#D6D6D6' },
+                        /* { zIndex:12, type:"Text", 'textRef':"properties.kind_detail", fill:"#252525"} */
+                      ]
+                    },
+
+                    assign: function (feature, level)
+                    {
+                        var props = feature.properties;
+                        var kind  = props.kind;
+                        var layer = props.layer; // the data layer of the feature
+                        var geom  = feature.geometry.type;
+
+                        //console.log(layer+ "-"+kind+"-"+geom);
+                        //console.log(props);
+
+                        if (layer == 'water') {
+                            if (geom == 'LineString' ) {
+                                return ;
+                            }
+                            if (geom == 'MultiLineString') {
+                              return ;
+                            }
+
+                        }
+
+                        if (layer== 'buildings') {
+
+                        }
+                        if (layer == 'roads') {
+                            //console.log(kind);
+                            if (kind == 'rail' || kind == 'ferry') {
+                                return 'road_transport';
+                            }
+                            if (kind == 'highway') {
+                                return layer + kind;
+                            }
+                            if (kind == 'major_road') {
+                                return layer + kind;
+                            }
+
+                        }
+                        return layer;
+                    }
+                }
+            })
+
+    ];
+
+
+
+
+
     console.log("layers created");
     console.log(this.$refs);
     console.log(this.zoom, this.lat, this.lng)
@@ -91,7 +193,7 @@ export default {
         longitude: this.lng,
         latitude: this.lat
       },
-      layers: layers
+      layers: layers2
     });
     console.log("map created",maplocal);
     var myStyle = {
@@ -165,7 +267,34 @@ export default {
       style: myStyle
     });
     console.log("spacelayer", mySpaceLayer);
-    maplocal.addLayer(mySpaceLayer);
+    //maplocal.addLayer(mySpaceLayer);
+
+    var pointLayer = new here.xyz.maps.layers.TileLayer({
+        			name: 'my Point Layer',
+                    min: 4,
+                    max: 15,
+                    provider: new here.xyz.maps.providers.LocalProvider ({
+					    name:  'my Point Provider'
+					}),
+				    style:{
+					    styleGroups: {
+					    	style: [
+						    	{zIndex:0, type:"Circle", "stroke": "#FFFFFF", "fill": "#6B6B6B", radius: 3},
+						    	{zIndex:1, type:"Text", textRef:"properties.name", fill:"#111", offsetY: 12, font: "bold 13px ariel"}
+						    ]
+					    },
+					    assign: function(feature){
+					    	return "style";
+					    }
+				    }
+        });
+        maplocal.addLayer(pointLayer);
+
+
+
+
+
+
     console.log("spacelayer added", maplocal);
     maplocal.addObserver('zoomlevel',(name, newValue, oldValue) => {
       //console.log(name + " new: "+ newValue + " old:" + oldValue);
