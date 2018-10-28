@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    zoom: 4,
+    zoom: 17,
     lat: 37.77956,
     lng: -122.46852,
     map: null
@@ -41,7 +41,7 @@ export default new Vuex.Store({
       state.map.setCenter(lng, lat);
     },
     setZoomAction({ commit, state },  zoom ){
-      console.log("setZoomAction",zoom);
+
       commit({
         type: 'setZoom',
         zoom,
