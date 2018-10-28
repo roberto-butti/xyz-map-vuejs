@@ -36,7 +36,7 @@ export default {
         lng: e.suggestion.latlng.lng,
         lat: e.suggestion.latlng.lat
       })
-      this.setZoomAction(13);
+      this.setZoomAction(17);
 
       //console.log(e.suggestion.latlng);
 
