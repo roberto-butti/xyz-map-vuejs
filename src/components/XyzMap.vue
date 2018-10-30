@@ -45,10 +45,13 @@ export default {
         ) {
           console.log("CHANGED MONITOR X Y",this.lat,this.lng);
           this.setLatLngAction({ lat: this.mapCurrentLat, lng: this.mapCurrentLng})
+          this.map.setCenter(this.mapCurrentLng, this.mapCurrentLat);
+
         }
         if (this.mapCurrentZoom != this.zoom ) {
           console.log("CHANGED MONITOR Z",this.zoom);
           this.setZoomAction(this.mapCurrentZoom)
+          this.map.setZoomlevel(this.mapCurrentZoom)
         }
 
 
@@ -344,6 +347,21 @@ export default {
       this.mapCurrentLat =  newValue.latitude;
       this.mapCurrentLng =  newValue.longitude;
       //this.setLatLngAction({ lat: newValue.latitude, lng: newValue.longitude})
+    });
+
+    maplocal.addEventListener('pointerup',(evt) => {
+      // Click on a feature
+      if(evt.target){
+        var properties = evt.target.properties;
+        console.log(properties);
+        // Display feature user properties
+        //infoTag.innerText = JSON.stringify(properties, undefined, 4);
+      }
+      // Feature is not clicked
+      else{
+        console.log("No feature is clicked");
+        //infoTag.innerText = "No feature is clicked!";
+      }
     });
     //setTimeout(this.monitorChanges(), (1 * 1000));
     this.monitorChanges();

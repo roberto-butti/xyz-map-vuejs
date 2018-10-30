@@ -8,7 +8,8 @@ export default new Vuex.Store({
     zoom: 11,
     lat: 37.77956,
     lng: -122.46852,
-    map: null
+    map: null,
+    info: ""
 
   },
   mutations: {
@@ -23,35 +24,39 @@ export default new Vuex.Store({
     },
     setMap(state, { map }){
       state.map = map;
+    },
+    setInfo(state, { info }){
+      state.info = info;
     }
 
   },
   actions: {
-    setLatLngAction({ commit,state }, { lat, lng}){
+    setLatLngAction({ commit }, { lat, lng}){
       commit({
         type: 'setLat',
         lat,
       })
-
       commit({
         type: 'setLng',
         lng,
       })
-
-      state.map.setCenter(lng, lat);
     },
-    setZoomAction({ commit, state },  zoom ){
-
+    setZoomAction({ commit },  zoom ){
       commit({
         type: 'setZoom',
         zoom,
       })
-      state.map.setZoomlevel(zoom);
     },
     setMapAction({ commit }, map ){
       commit({
         type: 'setMap',
         map,
+      })
+    },
+    setInfoAction({ commit }, info ){
+      commit({
+        type: 'setInfo',
+        info,
       })
     }
   }
