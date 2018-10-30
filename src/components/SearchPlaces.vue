@@ -37,6 +37,8 @@ export default {
         lat: e.suggestion.latlng.lat
       })
       this.setZoomAction(17);
+      this.map.setCenter(e.suggestion.latlng.lng, e.suggestion.latlng.lat);
+      this.map.setZoomlevel(17)
 
       //console.log(e.suggestion.latlng);
 
