@@ -28,13 +28,15 @@ export default {
       lng: state => state.lng,
       zoom: state => state.zoom,
       map: state => state.map,
+      info: state => state.info,
     })
   },
   methods: {
     ...mapActions({
       setLatLngAction: 'setLatLngAction',
       setZoomAction: 'setZoomAction',
-      setMapAction: 'setMapAction'
+      setMapAction: 'setMapAction',
+      setInfoAction: 'setInfoAction'
     }),
     monitorChanges: function () {
       this.intervalmonitor = setInterval( () => {
@@ -352,24 +354,20 @@ export default {
     maplocal.addEventListener('pointerup',(evt) => {
       // Click on a feature
       if(evt.target){
-        var properties = evt.target.properties;
-        console.log(properties);
-        // Display feature user properties
+        var properties = evt.target.properties
+        this.setInfoAction(properties)
         //infoTag.innerText = JSON.stringify(properties, undefined, 4);
-      }
-      // Feature is not clicked
-      else{
+      } else{
         console.log("No feature is clicked");
-        //infoTag.innerText = "No feature is clicked!";
       }
     });
-    //setTimeout(this.monitorChanges(), (1 * 1000));
+
     this.monitorChanges();
     this.setMapAction(maplocal);
     this.createMarkers()
     setInterval( () => {
       this.createMarkers()
-    }, 10000 );
+    }, 5000 );
     this.$nextTick(function () {
       this.onResize();
 

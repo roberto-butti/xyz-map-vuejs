@@ -10,7 +10,11 @@
         <v-card-title primary-title>
           <h2>Search your place</h2>
           <SearchPlaces msg=this.appname />
+
         </v-card-title>
+        <v-card-text>
+          <FeatureInfo msg=this.appname />
+        </v-card-text>
 
 
       </v-card>
@@ -45,12 +49,14 @@
 <script>
 import XyzMap from './components/XyzMap.vue'
 import SearchPlaces from './components/SearchPlaces.vue'
+import FeatureInfo from './components/FeatureInfo.vue'
 
 export default {
   name: 'app',
   components: {
     XyzMap,
-    SearchPlaces
+    SearchPlaces,
+    FeatureInfo
   },
   data: () => ({
       drawer: true,
