@@ -9,6 +9,7 @@ This is my playground with XYZ Maps JS and Vue.JS
 *  [Vue CLI 3](https://cli.vuejs.org/)
 *  [Vue.js](https://vuejs.org/) 
 *  [XYZ Maps Playground](https://xyz.api.here.com/maps/latest/playground/index.html)
+*  [Vuetify, Material Design Component Frameworks](https://vuetifyjs.com/en/)
 
 ## Run the project locally
 ```
