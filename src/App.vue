@@ -20,7 +20,7 @@
       </v-card>
     </v-navigation-drawer>
 
-    <v-toolbar  dense  color="indigo" dark fixed app>
+    <v-toolbar  dense   dark fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title></v-toolbar-title>
 
