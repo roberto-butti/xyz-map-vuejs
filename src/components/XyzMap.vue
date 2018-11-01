@@ -119,7 +119,7 @@ export default {
       } else {
           this.msg = "Geolocation is not supported by this browser.";
       }
-      this.map.getViewPort().resize();
+      //this.map.getViewPort().resize();
     },
 
     geoSetPosition: function (position, wantReverse = true) {
@@ -361,8 +361,9 @@ export default {
       this.createMarkers()
     }, 10000 );
     this.$nextTick(function () {
-      this.geolocateme()
       this.onResize();
+      this.geolocateme()
+
 
     })
     //maplocal.getViewPort().resize()
