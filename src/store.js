@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    zoom: 11,
+    zoom: 18, //11,
     lat: 37.77956,
     lng: -122.46852,
     map: null,

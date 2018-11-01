@@ -7,6 +7,8 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import defaultstyle from '../stylemap/default.js';
+
 const axios = require('axios');
 export default {
   name: "XyzMap",
@@ -103,7 +105,62 @@ export default {
       axios
         .get(urlProxy+""+urlAdsb)
         .then(response => ( this.addFeatures(response.data)))
-    }
+    },
+
+    geolocateme: function () {
+      if (navigator.geolocation) {
+          var options = {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          }
+
+          navigator.geolocation.getCurrentPosition(this.geoSetPosition, this.errorCurrentPosition, options)
+      } else {
+          this.msg = "Geolocation is not supported by this browser.";
+      }
+      this.map.getViewPort().resize();
+    },
+
+    geoSetPosition: function (position, wantReverse = true) {
+      console.log(position)
+
+      this.mapCurrentLat = position.coords.latitude;
+      this.mapCurrentLng = position.coords.longitude;
+      this.setLatLngAction({ lat: this.mapCurrentLat, lng: this.mapCurrentLng})
+      this.map.setCenter(this.mapCurrentLng, this.mapCurrentLat);
+
+      /*
+      this.lat = position.coords.latitude
+      this.lng = position.coords.longitude
+      this.accuracy = position.coords.accuracy
+      this.altitude = position.coords.altitude
+      this.altitudeAccuracy = position.coords.altitudeAccuracy
+      this.speed = position.coords.speed
+      this.heading = position.coords.heading
+      this.switchLayerSatelliteTraffic()
+      this.map.setZoom(18);
+      this.updateCenter()
+      this.msg = "Found on: "+this.lat+" "+this.lng
+      if (wantReverse) {
+        this.reverseGeocoding()
+      }
+      this.loading=false
+      */
+    },
+    errorCurrentPosition: function (err) {
+      var strError = 'ERROR('+err.code+'): '+err.message
+      console.log(strError)
+      /*
+      this.msg =strError
+      this.loading=false
+      this.loading_followme=false
+      */
+    },
+
+
+
+
   },
   mounted: function() {
     this.mapCurrentLat = this.lat;
@@ -145,72 +202,7 @@ export default {
         How to Style
         https://xyz.api.here.com/maps/latest/documentation/here.xyz.maps.layers.TileLayer.Style.html
         */
-        style : {
-          backgroundColor: '#555555',
-          strokeWidthZoomScale: function (level) {
-            return level > 17 ? 1 : level > 14 ? .5 : .25
-          },
-          styleGroups: {
-            'earth'        : [{ zIndex: 1, type: 'Polygon', fill: '#DEDEDE' }],
-            'water'        : [{ zIndex: 2, type: 'Polygon', fill: '#79CFEE' }],
-            'landuse'      : [{ zIndex: 3, type: 'Polygon', fill: '#B7E4A1' }],
-            'road_transport'        : [
-              {zIndex:4, type:"Line", stroke:"#B6B8C3", "strokeWidth":4, "strokeLinecap": "butt"},
-              {zIndex:5, type:"Line", stroke:"#C8C9CE", "strokeWidth":4, "strokeLinecap": "butt", 'strokeDasharray': [12,10]},
-            ],
-            'roads' : [
-              {zIndex:5, type:"Line", stroke:"#D6D9E6", "strokeWidth":14},
-              {zIndex:6, type:"Line", stroke:"#FFFFFF", "strokeWidth":10},
-              {zIndex:100, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal  12px Verdana"}
-            ],
-            'roadshighway' : [
-              {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
-              {zIndex:9, type:"Line", stroke:"#FDA363", "strokeWidth":10},
-              {zIndex:101, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal 12px Verdana"}
-            ],
-            'roadsmajor_road' : [
-              {zIndex:8, type:"Line", stroke:"#FFFFFF", "strokeWidth":14},
-              {zIndex:9, type:"Line", stroke:"#F1D06B", "strokeWidth":10},
-              {zIndex:102, type:"Text", 'textRef':"properties.name", fill:"#252525", font:"normal 12px Verdana"}
-            ],
-            'buildings'    : [
-              { zIndex: 11, type: 'Polygon', stroke: "#BDBBB7","strokeWidth":1, fill: '#D6D6D6' },
-              /* { zIndex:12, type:"Text", 'textRef':"properties.kind_detail", fill:"#252525"} */
-            ]
-          },
-          assign: function (feature, level)
-          {
-            var props = feature.properties;
-            var kind  = props.kind;
-            var layer = props.layer; // the data layer of the feature
-            var geom  = feature.geometry.type;
-            //console.log(layer+ "-"+kind+"-"+geom);
-            //console.log(props);
-            if (layer == 'water') {
-              if (geom == 'LineString' ) {
-                return ;
-              }
-              if (geom == 'MultiLineString') {
-                return ;
-              }
-            }
-            if (layer== 'buildings') {
-            }
-            if (layer == 'roads') {
-              //console.log(kind);
-              if (kind == 'rail' || kind == 'ferry') {
-                  return 'road_transport';
-              }
-              if (kind == 'highway') {
-                  return layer + kind;
-              }
-              if (kind == 'major_road') {
-                  return layer + kind;
-              }
-            }
-            return layer;
-          }
-        }
+        style : defaultstyle
       })
     ];
     console.log("layers created");
@@ -367,8 +359,9 @@ export default {
     this.createMarkers()
     setInterval( () => {
       this.createMarkers()
-    }, 5000 );
+    }, 10000 );
     this.$nextTick(function () {
+      this.geolocateme()
       this.onResize();
 
     })
