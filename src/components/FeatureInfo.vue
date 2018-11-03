@@ -1,7 +1,11 @@
 <template>
   <div class="feature-info" ref="feature-info">
-aaa
-      <div>{{ info }}</div>
+    <div>
+      <ul>
+      <li v-for="(item, index) in info">{{ index}}:{{item}}</li>
+      </ul>
+    </div>
+
   </div>
 </template>
 
