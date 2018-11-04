@@ -1,9 +1,8 @@
 <template>
   <div class="input-map" ref="myInputMap">
+
       <input type="search" ref="city" class="form-control" placeholder="In which city do you live?" />
-      <div>{{ lat }}</div>
-      <div>{{ lng }}</div>
-      <div>{{ zoom }}</div>
+
   </div>
 </template>
 

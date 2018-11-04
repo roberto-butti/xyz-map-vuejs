@@ -1,6 +1,14 @@
 <template>
     <div v-resize="onResize" class="map-container">
+<div class="info-panel-over-map">
+  {{ mapCurrentLat }},
+  {{ mapCurrentLng }} x
+  {{ mapCurrentZoom }}<br>
+<FeatureInfo msg=this.appname />
+</div>
+
         <div class="map" ref="myMap">
+
         </div>
   </div>
 </template>
@@ -8,10 +16,15 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import defaultstyle from '../stylemap/default.js';
+import FeatureInfo from './FeatureInfo.vue'
 
 const axios = require('axios');
 export default {
   name: "XyzMap",
+  components: {
+
+    FeatureInfo
+  },
   data: function() {
     return {
       mapCurrentLat: null,
@@ -374,10 +387,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .map {
-  top: 0;
+  top: 48px;
   left: 0;
   /*width: 100%;*/
-  height: 88vh;
+  height: 91vh;
 }
 .map-container {
   top: 0;
@@ -385,5 +398,15 @@ export default {
   padding: 0px;
   width: 100%;
   /*height: 400px;*/
+}
+
+.info-panel-over-map {
+  z-index:9999;
+  position:absolute;
+  background-color:rgba(255,247,153, 0.5);
+  width:200px;
+  /*
+  height:120px;*/
+  border:solid 1px orange;
 }
 </style>
