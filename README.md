@@ -1,4 +1,6 @@
-# xyz-map-vuejs
+# Vue.js and HERE XYZ Maps JS
+
+You can see the [Demo Sample] on Netlify:(https://happy-archimedes-ea1bf7.netlify.com/) 
 
 ## The Project
 
